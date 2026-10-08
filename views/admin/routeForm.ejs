@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h2 style="font-size:1.15rem; color:var(--navy);"><%= title %></h2>
+      <a href="/admin/rute" class="btn btn-secondary btn-sm">← Kembali</a>
+    </div>
+    <div class="admin-content">
+      <div class="container-narrow">
+        <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+        <div class="card">
+          <div class="card-body">
+            <form method="POST" action="/admin/rute/simpan<%= route && route.id ? '?id=' + route.id : '' %>">
+              <% if (route && route.id) { %><input type="hidden" name="id" value="<%= route.id %>"><% } %>
+              <div class="form-group mb-2">
+                <label>Pelabuhan Asal *</label>
+                <select name="origin_port_id" class="form-control" required>
+                  <option value="">— Pilih Asal —</option>
+                  <% ports.forEach(p => { %>
+                    <option value="<%= p.id %>" <%= route && route.origin_port_id == p.id ? 'selected' : '' %>><%= p.name %> (<%= p.city %>)</option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group mb-2">
+                <label>Pelabuhan Tujuan *</label>
+                <select name="destination_port_id" class="form-control" required>
+                  <option value="">— Pilih Tujuan —</option>
+                  <% ports.forEach(p => { %>
+                    <option value="<%= p.id %>" <%= route && route.destination_port_id == p.id ? 'selected' : '' %>><%= p.name %> (<%= p.city %>)</option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group mb-2">
+                <label>Estimasi Durasi Perjalanan *</label>
+                <input type="text" name="duration" class="form-control" value="<%= route ? route.duration : '' %>" required placeholder="Contoh: 4 jam">
+              </div>
+              <div class="form-group mb-3">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                  <option value="aktif" <%= !route || route.status === 'aktif' ? 'selected' : '' %>>Aktif</option>
+                  <option value="nonaktif" <%= route && route.status === 'nonaktif' ? 'selected' : '' %>>Nonaktif</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">💾 Simpan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

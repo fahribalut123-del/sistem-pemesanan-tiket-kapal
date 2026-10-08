@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h2 style="font-size:1.15rem; color:var(--navy);"><%= title %></h2>
+      <a href="/admin/jadwal" class="btn btn-secondary btn-sm">← Kembali</a>
+    </div>
+    <div class="admin-content">
+      <div class="container-narrow">
+        <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+        <div class="card">
+          <div class="card-body">
+            <form method="POST" action="/admin/jadwal/simpan<%= schedule && schedule.id ? '?id=' + schedule.id : '' %>">
+              <% if (schedule && schedule.id) { %><input type="hidden" name="id" value="<%= schedule.id %>"><% } %>
+              <div class="form-group mb-2">
+                <label>Kapal *</label>
+                <select name="ship_id" class="form-control" required>
+                  <option value="">— Pilih Kapal —</option>
+                  <% ships.forEach(s => { %>
+                    <option value="<%= s.id %>" <%= schedule && schedule.ship_id == s.id ? 'selected' : '' %>><%= s.name %> (<%= s.type %> - <%= s.capacity %> kursi)</option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group mb-2">
+                <label>Rute *</label>
+                <select name="route_id" class="form-control" required>
+                  <option value="">— Pilih Rute —</option>
+                  <% routes.forEach(r => { %>
+                    <option value="<%= r.id %>" <%= schedule && schedule.route_id == r.id ? 'selected' : '' %>><%= r.origin_name %> → <%= r.destination_name %> (<%= r.duration %>)</option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group mb-2">
+                  <label>Tanggal Keberangkatan *</label>
+                  <input type="date" name="departure_date" class="form-control" value="<%= schedule ? schedule.departure_date : '' %>" required min="<%= today %>">
+                </div>
+                <div class="form-group mb-2">
+                  <label>Status Jadwal</label>
+                  <select name="status" class="form-control">
+                    <% ['terjadwal','boarding','berangkat','selesai','dibatalkan'].forEach(st => { %>
+                      <option value="<%= st %>" <%= schedule && schedule.status === st ? 'selected' : (!schedule && st === 'terjadwal' ? 'selected' : '') %>><%= st.charAt(0).toUpperCase() + st.slice(1) %></option>
+                    <% }) %>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group mb-2">
+                  <label>Jam Keberangkatan *</label>
+                  <input type="time" name="departure_time" class="form-control" value="<%= schedule ? schedule.departure_time : '' %>" required>
+                </div>
+                <div class="form-group mb-2">
+                  <label>Jam Tiba *</label>
+                  <input type="time" name="arrival_time" class="form-control" value="<%= schedule ? schedule.arrival_time : '' %>" required>
+                </div>
+              </div>
+              <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group mb-2">
+                  <label>Harga Tiket (Rp) *</label>
+                  <input type="number" name="price" class="form-control" value="<%= schedule ? schedule.price : '' %>" required min="1" placeholder="Contoh: 150000">
+                </div>
+                <div class="form-group mb-2">
+                  <label>Kapasitas *</label>
+                  <input type="number" name="capacity" class="form-control" value="<%= schedule ? schedule.capacity : '' %>" required min="1" placeholder="Contoh: 200">
+                </div>
+              </div>
+              <% if (schedule) { %>
+                <div class="alert alert-info">Kursi tersedia saat ini: <strong><%= schedule.available_seats %></strong> dari <%= schedule.capacity %>. Jika kapasitas diubah, kursi tersedia akan disesuaikan.</div>
+              <% } %>
+              <button type="submit" class="btn btn-primary btn-block">💾 Simpan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

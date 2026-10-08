@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <button class="nav-toggle" style="display:none;" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+      <h2 style="font-size:1.15rem; color:var(--navy);">💳 Pembayaran</h2>
+    </div>
+    <div class="admin-content">
+      <% if (locals.success) { %><div class="alert alert-success">✅ Verifikasi berhasil.</div><% } %>
+
+      <div class="d-flex gap-1 mb-2 flex-wrap">
+        <a href="/admin/pembayaran" class="btn <%= !filterStatus ? 'btn-primary' : 'btn-secondary' %> btn-sm">Semua</a>
+        <a href="/admin/pembayaran?status=menunggu_verifikasi" class="btn <%= filterStatus === 'menunggu_verifikasi' ? 'btn-primary' : 'btn-secondary' %> btn-sm">⏳ Menunggu Verifikasi</a>
+        <a href="/admin/pembayaran?status=dibayar" class="btn <%= filterStatus === 'dibayar' ? 'btn-primary' : 'btn-secondary' %> btn-sm">✅ Dibayar</a>
+        <a href="/admin/pembayaran?status=ditolak" class="btn <%= filterStatus === 'ditolak' ? 'btn-primary' : 'btn-secondary' %> btn-sm">❌ Ditolak</a>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th><th>Booking</th><th>Pelanggan</th><th>Metode</th><th>Jumlah</th><th>Referensi</th><th>Status</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% payments.forEach(p => { %>
+                  <tr>
+                    <td><%= p.id %></td>
+                    <td class="font-bold"><a href="/admin/pesanan/<%= p.booking_code %>"><%= p.booking_code %></a></td>
+                    <td><%= p.user_name %><br><small class="text-muted"><%= p.user_email %></small></td>
+                    <td><%= p.payment_method === 'transfer_bank' ? '🏦 Transfer Bank' : (p.payment_method === 'ewallet' ? '📱 E-Wallet' : '🏧 Virtual Account') %></td>
+                    <td class="font-bold"><%= money(p.amount) %></td>
+                    <td style="font-family:monospace; font-size:.8rem;"><%= p.payment_reference %></td>
+                    <td>
+                      <span class="badge <%= p.status === 'dibayar' ? 'badge-success' : (p.status === 'ditolak' ? 'badge-danger' : 'badge-warning') %>">
+                        <%= p.status === 'dibayar' ? 'Lunas' : (p.status === 'ditolak' ? 'Ditolak' : 'Menunggu Verifikasi') %>
+                      </span>
+                    </td>
+                    <td>
+                      <% if (p.status === 'menunggu_verifikasi') { %>
+                        <form method="POST" action="/admin/pembayaran/<%= p.id %>/verifikasi" class="inline-form" style="display:flex; gap:.3rem;">
+                          <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">✅ Approve</button>
+                          <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm" onclick="return confirm('Tolak pembayaran ini? Kursi akan dikembalikan.');">❌ Tolak</button>
+                        </form>
+                      <% } else { %>
+                        <a href="/admin/pesanan/<%= p.booking_code %>" class="btn btn-outline btn-sm">Detail</a>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

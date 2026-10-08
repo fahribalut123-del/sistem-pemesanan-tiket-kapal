@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-3">
+  <a href="javascript:history.back()" class="btn btn-secondary btn-sm mb-2">← Kembali</a>
+  <div class="card">
+    <div class="card-header">
+      <span>🚢 Detail Kapal</span>
+      <span class="badge <%= ship.status === 'aktif' ? 'badge-success' : 'badge-danger' %>"><%= ship.status === 'aktif' ? 'Aktif' : 'Nonaktif' %></span>
+    </div>
+    <div class="card-body">
+      <div class="d-flex gap-2 flex-wrap">
+        <div style="flex:1; min-width:250px;">
+          <h2 style="color:var(--navy); margin-bottom:.5rem;"><%= ship.name %></h2>
+          <div class="detail-rows">
+            <div class="detail-row"><span class="label">ID Kapal</span><span class="value">#<%= ship.id %></span></div>
+            <div class="detail-row"><span class="label">Nomor Kapal</span><span class="value"><%= ship.number || '-' %></span></div>
+            <div class="detail-row"><span class="label">Jenis Kapal</span><span class="value"><span class="badge badge-info"><%= ship.type %></span></span></div>
+            <div class="detail-row"><span class="label">Kapasitas</span><span class="value"><%= ship.capacity %> penumpang</span></div>
+            <div class="detail-row"><span class="label">Status</span><span class="value"><span class="badge <%= ship.status==='aktif'?'badge-success':'badge-danger' %>"><%= ship.status %></span></span></div>
+          </div>
+          <% if (ship.description) { %>
+            <h3 class="mt-3" style="font-size:1rem; color:var(--navy);">Deskripsi</h3>
+            <p style="color:var(--gray-600);"><%= ship.description %></p>
+          <% } %>
+          <% if (ship.facilities) { %>
+            <h3 class="mt-3" style="font-size:1rem; color:var(--navy);">Fasilitas</h3>
+            <div class="d-flex gap-1 flex-wrap">
+              <% ship.facilities.split(',').forEach(f => { %>
+                <span class="badge badge-info"><%= f.trim() %></span>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if (upcoming.length > 0) { %>
+    <h2 class="section-title mt-4">Jadwal Berikutnya</h2>
+    <div class="schedule-grid">
+      <% upcoming.forEach(s => { %>
+        <div class="schedule-card">
+          <div class="card-top">
+            <div>
+              <div class="ship-name"><%= ship.name %></div>
+              <div class="ship-type"><%= s.origin_name %> → <%= s.destination_name %></div>
+            </div>
+          </div>
+          <div class="route-info">
+            <div class="port"><div class="time"><%= s.departure_time %></div><div class="name"><%= s.departure_date %></div></div>
+            <div class="route-line"><div class="line"></div></div>
+            <div class="port"><div class="time"><%= s.arrival_time %></div><div class="name">Tiba</div></div>
+          </div>
+          <div class="card-bottom">
+            <div class="price"><%= money(s.price) %></div>
+            <span class="seat-info"><span class="dot <%= s.available_seats > 10 ? 'green' : 'yellow' %>"></span> <%= s.available_seats %> kursi</span>
+          </div>
+          <% if (s.available_seats > 0 && s.status === 'terjadwal') { %>
+            <div style="padding:0 1.15rem 1rem;"><a href="/pesan/<%= s.id %>" class="btn btn-primary btn-block">Pilih Jadwal</a></div>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

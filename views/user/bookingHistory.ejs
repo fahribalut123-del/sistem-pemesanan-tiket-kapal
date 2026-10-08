@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-3">
+  <h2 class="section-title">📋 Pesanan Saya</h2>
+
+  <% if (bookings.length === 0) { %>
+    <div class="alert alert-info text-center" style="padding:2.5rem;">
+      <div style="font-size:2.5rem;">📋</div>
+      <h3>Belum ada pemesanan</h3>
+      <p>Mulai memesan tiket kapal sekarang.</p>
+      <a href="/cari" class="btn btn-primary mt-2">🔍 Cari Tiket</a>
+    </div>
+  <% } else { %>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Kode Booking</th>
+            <th>Tanggal Pesan</th>
+            <th>Rute</th>
+            <th>Kapal</th>
+            <th>Keberangkatan</th>
+            <th>Penumpang</th>
+            <th>Total</th>
+            <th>Pembayaran</th>
+            <th>Perjalanan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% bookings.forEach(b => { %>
+            <tr>
+              <td class="font-bold"><%= b.booking_code %></td>
+              <td><%= b.created_at.split(' ')[0] %></td>
+              <td><%= b.origin_name %> → <%= b.destination_name %></td>
+              <td><%= b.ship_name %></td>
+              <td><%= b.departure_date %> <%= b.departure_time %></td>
+              <td><%= b.total_passengers %></td>
+              <td class="font-bold"><%= money(b.total_price) %></td>
+              <td>
+                <span class="badge <%= b.payment_status === 'dibayar' ? 'badge-success' : (b.payment_status === 'menunggu_verifikasi' ? 'badge-warning' : (b.payment_status === 'dibatalkan' ? 'badge-secondary' : 'badge-danger')) %>">
+                  <%= b.payment_status === 'dibayar' ? 'Lunas' : (b.payment_status === 'menunggu_verifikasi' ? 'Menunggu Verifikasi' : (b.payment_status === 'dibatalkan' ? 'Dibatalkan' : 'Belum Dibayar')) %>
+                </span>
+              </td>
+              <td>
+                <span class="badge <%= b.booking_status === 'dikonfirmasi' ? 'badge-info' : (b.booking_status === 'dibatalkan' ? 'badge-secondary' : 'badge-warning') %>">
+                  <%= b.booking_status === 'dikonfirmasi' ? 'Dikonfirmasi' : (b.booking_status === 'dibatalkan' ? 'Dibatalkan' : b.booking_status) %>
+                </span>
+              </td>
+              <td>
+                <div class="d-flex gap-1" style="flex-wrap:wrap;">
+                  <a href="/pesanan/<%= b.booking_code %>" class="btn btn-outline btn-sm">Detail</a>
+                  <% if (b.payment_status === 'dibayar') { %>
+                    <a href="/tiket" class="btn btn-primary btn-sm">🎫 Tiket</a>
+                  <% } else if (b.payment_status !== 'dibatalkan' && b.booking_status !== 'dibatalkan') { %>
+                    <a href="/checkout/<%= b.booking_code %>" class="btn btn-warning btn-sm">💳 Bayar</a>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

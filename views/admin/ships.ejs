@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <button class="nav-toggle" style="display:none;" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+      <h2 style="font-size:1.15rem; color:var(--navy);">🚢 Kelola Kapal</h2>
+      <a href="/admin/kapal/tambah" class="btn btn-primary btn-sm">+ Tambah Kapal</a>
+    </div>
+    <div class="admin-content">
+      <% if (success) { %><div class="alert alert-success">✅ Data berhasil disimpan.</div><% } %>
+      <% if (error) { %><div class="alert alert-warning"><%= error %></div><% } %>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Nama</th><th>Nomor</th><th>Jenis</th><th>Kapasitas</th><th>Status</th><th>Aksi</th></tr>
+              </thead>
+              <tbody>
+                <% ships.forEach(s => { %>
+                  <tr>
+                    <td><%= s.id %></td>
+                    <td class="font-bold"><%= s.name %></td>
+                    <td><%= s.number || '-' %></td>
+                    <td><span class="badge badge-info"><%= s.type %></span></td>
+                    <td><%= s.capacity %></td>
+                    <td><span class="badge <%= s.status === 'aktif' ? 'badge-success' : 'badge-danger' %>"><%= s.status %></span></td>
+                    <td>
+                      <a href="/admin/kapal/<%= s.id %>/edit" class="btn btn-outline btn-sm">Edit</a>
+                      <form method="POST" action="/admin/kapal/<%= s.id %>/hapus" class="inline-form" onsubmit="return confirm('Yakin hapus/nonaktifkan kapal <%= s.name %>?');">
+                        <button type="submit" class="btn btn-danger btn-sm"><%= s.status === 'aktif' ? 'Nonaktifkan' : 'Hapus' %></button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

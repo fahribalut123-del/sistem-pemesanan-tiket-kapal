@@ -1,0 +1,23 @@
+<nav class="navbar">
+  <a href="/" class="brand"><span>🚢</span> TiketKapal</a>
+  <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+  <ul class="nav-links">
+    <% if (user) { %>
+      <% if (user.role === 'admin') { %>
+        <li><a href="/admin/dashboard">Dashboard Admin</a></li>
+      <% } else { %>
+        <li><a href="/">Beranda</a></li>
+        <li><a href="/cari">Cari Tiket</a></li>
+        <li><a href="/pesanan">Pesanan Saya</a></li>
+        <li><a href="/tiket">Tiket Saya</a></li>
+        <li><a href="/profil">Profil</a></li>
+      <% } %>
+      <li><a href="/logout">Logout (<%= user.name.split(' ')[0] %>)</a></li>
+    <% } else { %>
+      <li><a href="/">Beranda</a></li>
+      <li><a href="/cari">Cari Tiket</a></li>
+      <li><a href="/login">Login</a></li>
+      <li><a href="/register">Daftar</a></li>
+    <% } %>
+  </ul>
+</nav>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <button class="nav-toggle" style="display:none;" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+      <h2 style="font-size:1.15rem; color:var(--navy);">👥 Data Penumpang</h2>
+    </div>
+    <div class="admin-content">
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th><th>Nama</th><th>NIK</th><th>Gender</th><th>Lahir</th><th>Telepon</th>
+                  <th>Booking</th><th>Tanggal</th><th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% passengers.forEach((p, i) => { %>
+                  <tr>
+                    <td><%= i+1 %></td>
+                    <td class="font-bold"><%= p.name %></td>
+                    <td><%= p.nik.substring(0,4) + '**********' + p.nik.substring(14) %></td>
+                    <td><%= p.gender %></td>
+                    <td><%= p.birth_date %></td>
+                    <td><%= p.phone || '-' %></td>
+                    <td><a href="/admin/pesanan/<%= p.booking_code %>"><%= p.booking_code %></a></td>
+                    <td><%= p.departure_date %></td>
+                    <td>
+                      <span class="badge <%= p.payment_status === 'dibayar' ? 'badge-success' : (p.payment_status === 'dibatalkan' ? 'badge-secondary' : 'badge-warning') %>">
+                        <%= p.payment_status === 'dibayar' ? 'Lunas' : (p.payment_status === 'dibatalkan' ? 'Dibatalkan' : 'Menunggu') %>
+                      </span>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

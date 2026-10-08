@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="icon">🚢</div>
+      <h2>Masuk ke Akun</h2>
+      <p>Login untuk memesan tiket kapal</p>
+    </div>
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" class="form-control" required placeholder="Masukkan email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" required placeholder="Masukkan password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">Login</button>
+    </form>
+    <div class="auth-footer">
+      Belum punya akun? <a href="/register">Daftar di sini</a>
+    </div>
+    <div class="auth-footer mt-1" style="font-size:.78rem; border-top:1px solid var(--gray-200); padding-top:.75rem;">
+      <strong>Demo:</strong> admin@kapal.com / admin123 &middot; budi@example.com / user123
+    </div>
+  </div>
+</div>
+</body>
+</html>

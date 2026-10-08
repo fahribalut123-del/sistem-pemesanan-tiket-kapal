@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <button class="nav-toggle" style="display:none;" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+      <h2 style="font-size:1.15rem; color:var(--navy);">📊 Dashboard</h2>
+      <span class="text-muted" style="font-size:.85rem;">Selamat datang, <%= user.name %></span>
+    </div>
+    <div class="admin-content">
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">🚢</div>
+          <div class="stat-info">
+            <div class="stat-value"><%= stats.totalShips %></div>
+            <div class="stat-label">Total Kapal</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">🗺️</div>
+          <div class="stat-info">
+            <div class="stat-value"><%= stats.totalRoutes %></div>
+            <div class="stat-label">Total Rute</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">📅</div>
+          <div class="stat-info">
+            <div class="stat-value"><%= stats.activeSchedules %></div>
+            <div class="stat-label">Jadwal Aktif</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">👥</div>
+          <div class="stat-info">
+            <div class="stat-value"><%= stats.totalUsers %></div>
+            <div class="stat-label">Total Pengguna</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">📋</div>
+          <div class="stat-info">
+            <div class="stat-value"><%= stats.totalBookings %></div>
+            <div class="stat-label">Total Pemesanan</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow">🆕</div>
+          <div class="stat-info">
+            <div class="stat-value"><%= stats.todayBookings %></div>
+            <div class="stat-label">Pemesanan Hari Ini</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">💰</div>
+          <div class="stat-info">
+            <div class="stat-value" style="font-size:1.1rem;"><%= money(stats.totalRevenue) %></div>
+            <div class="stat-label">Total Pendapatan</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">⏳</div>
+          <div class="stat-info">
+            <div class="stat-value"><%= stats.pendingPayments %></div>
+            <div class="stat-label">Menunggu Verifikasi</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="charts-row">
+        <div class="chart-container">
+          <h3>📈 Pemesanan 7 Hari Terakhir</h3>
+          <canvas id="bookingChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3>💰 Pendapatan per Bulan</h3>
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+
+      <!-- RECENT BOOKINGS -->
+      <div class="card">
+        <div class="card-header">
+          <span>📋 Pemesanan Terbaru</span>
+          <a href="/admin/pesanan" class="btn btn-outline btn-sm">Lihat Semua</a>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kode Booking</th>
+                  <th>Pelanggan</th>
+                  <th>Rute</th>
+                  <th>Tanggal</th>
+                  <th>Total</th>
+                  <th>Pembayaran</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recentBookings.forEach(b => { %>
+                  <tr>
+                    <td class="font-bold"><%= b.booking_code %></td>
+                    <td><%= b.user_name %></td>
+                    <td><%= b.origin_name %> → <%= b.destination_name %></td>
+                    <td><%= b.departure_date %></td>
+                    <td><%= money(b.total_price) %></td>
+                    <td><span class="badge <%= b.payment_status === 'dibayar' ? 'badge-success' : (b.payment_status === 'menunggu_verifikasi' ? 'badge-warning' : (b.payment_status === 'dibatalkan' ? 'badge-secondary' : 'badge-danger')) %>"><%= b.payment_status.replace(/_/g, ' ') %></span></td>
+                    <td><span class="badge <%= b.booking_status === 'dikonfirmasi' ? 'badge-info' : (b.booking_status === 'dibatalkan' ? 'badge-secondary' : 'badge-warning') %>"><%= b.booking_status %></span></td>
+                    <td><a href="/admin/pesanan/<%= b.booking_code %>" class="btn btn-outline btn-sm">Detail</a></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Booking per day chart
+const bpd = <%- JSON.stringify(bookingsPerDay) %>;
+new Chart(document.getElementById('bookingChart'), {
+  type: 'bar',
+  data: {
+    labels: bpd.map(d => d.day),
+    datasets: [{
+      label: 'Jumlah Pemesanan',
+      data: bpd.map(d => d.count),
+      backgroundColor: 'rgba(58,143,212,.7)',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+  }
+});
+
+// Revenue per month chart
+const rpm = <%- JSON.stringify(revenuePerMonth) %>;
+new Chart(document.getElementById('revenueChart'), {
+  type: 'line',
+  data: {
+    labels: rpm.map(d => d.month),
+    datasets: [{
+      label: 'Pendapatan (Rp)',
+      data: rpm.map(d => d.revenue),
+      borderColor: '#16a34a',
+      backgroundColor: 'rgba(22,163,74,.15)',
+      fill: true,
+      tension: .3
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+</script>
+</body>
+</html>

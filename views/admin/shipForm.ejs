@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h2 style="font-size:1.15rem; color:var(--navy);"><%= title %></h2>
+      <a href="/admin/kapal" class="btn btn-secondary btn-sm">← Kembali</a>
+    </div>
+    <div class="admin-content">
+      <div class="container-narrow">
+        <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+        <div class="card">
+          <div class="card-body">
+            <form method="POST" action="/admin/kapal/simpan<%= ship && ship.id ? '?id=' + ship.id : '' %>">
+              <% if (ship && ship.id) { %><input type="hidden" name="id" value="<%= ship.id %>"><% } %>
+              <div class="form-group mb-2">
+                <label>Nama Kapal *</label>
+                <input type="text" name="name" class="form-control" value="<%= ship ? ship.name : '' %>" required placeholder="Contoh: KM Bahari Nusantara">
+              </div>
+              <div class="form-group mb-2">
+                <label>Nomor Kapal</label>
+                <input type="text" name="number" class="form-control" value="<%= ship ? (ship.number || '') : '' %>" placeholder="Contoh: BN-001">
+              </div>
+              <div class="form-group mb-2">
+                <label>Jenis Kapal *</label>
+                <select name="type" class="form-control" required>
+                  <option value="">— Pilih Jenis —</option>
+                  <% ['Kapal Penumpang', 'Kapal Ferry', 'Kapal Cepat'].forEach(t => { %>
+                    <option value="<%= t %>" <%= ship && ship.type === t ? 'selected' : '' %>><%= t %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group mb-2">
+                <label>Kapasitas Penumpang *</label>
+                <input type="number" name="capacity" class="form-control" value="<%= ship ? ship.capacity : '' %>" required min="1" placeholder="Contoh: 200">
+              </div>
+              <div class="form-group mb-2">
+                <label>Deskripsi</label>
+                <textarea name="description" class="form-control" rows="3" placeholder="Deskripsi kapal"><%= ship ? (ship.description || '') : '' %></textarea>
+              </div>
+              <div class="form-group mb-2">
+                <label>Fasilitas (pisahkan dengan koma)</label>
+                <input type="text" name="facilities" class="form-control" value="<%= ship ? (ship.facilities || '') : '' %>" placeholder="AC, Kantin, Musholla, Life Jacket">
+              </div>
+              <div class="form-group mb-3">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                  <option value="aktif" <%= !ship || ship.status === 'aktif' ? 'selected' : '' %>>Aktif</option>
+                  <option value="nonaktif" <%= ship && ship.status === 'nonaktif' ? 'selected' : '' %>>Nonaktif</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">💾 Simpan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <button class="nav-toggle" style="display:none;" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+      <h2 style="font-size:1.15rem; color:var(--navy);">📋 Pemesanan</h2>
+    </div>
+    <div class="admin-content">
+      <div class="d-flex gap-1 mb-2 flex-wrap">
+        <a href="/admin/pesanan" class="btn <%= !filterStatus ? 'btn-primary' : 'btn-secondary' %> btn-sm">Semua</a>
+        <a href="/admin/pesanan?status=menunggu" class="btn <%= filterStatus === 'menunggu' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Menunggu</a>
+        <a href="/admin/pesanan?status=dikonfirmasi" class="btn <%= filterStatus === 'dikonfirmasi' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Dikonfirmasi</a>
+        <a href="/admin/pesanan?status=berangkat" class="btn <%= filterStatus === 'berangkat' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Berangkat</a>
+        <a href="/admin/pesanan?status=selesai" class="btn <%= filterStatus === 'selesai' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Selesai</a>
+        <a href="/admin/pesanan?status=dibatalkan" class="btn <%= filterStatus === 'dibatalkan' ? 'btn-primary' : 'btn-secondary' %> btn-sm">Dibatalkan</a>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Booking</th><th>Pelanggan</th><th>Rute</th><th>Tanggal</th>
+                  <th>Penumpang</th><th>Total</th><th>Pembayaran</th><th>Status</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% bookings.forEach(b => { %>
+                  <tr>
+                    <td class="font-bold"><%= b.booking_code %></td>
+                    <td><%= b.user_name %><br><small class="text-muted"><%= b.user_email %></small></td>
+                    <td><%= b.origin_name %> → <%= b.destination_name %></td>
+                    <td><%= b.departure_date %></td>
+                    <td><%= b.total_passengers %></td>
+                    <td class="font-bold"><%= money(b.total_price) %></td>
+                    <td><span class="badge <%= b.payment_status === 'dibayar' ? 'badge-success' : (b.payment_status === 'menunggu_verifikasi' ? 'badge-warning' : (b.payment_status === 'dibatalkan' ? 'badge-secondary' : 'badge-danger')) %>"><%= b.payment_status.replace(/_/g, ' ') %></span></td>
+                    <td><span class="badge <%= b.booking_status === 'dikonfirmasi' ? 'badge-info' : (b.booking_status === 'dibatalkan' ? 'badge-secondary' : 'badge-warning') %>"><%= b.booking_status %></span></td>
+                    <td><a href="/admin/pesanan/<%= b.booking_code %>" class="btn btn-outline btn-sm">Detail</a></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

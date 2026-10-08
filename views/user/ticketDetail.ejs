@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-3">
+  <div class="d-flex gap-1 mb-2 no-print">
+    <a href="/tiket" class="btn btn-secondary btn-sm">← Tiket Saya</a>
+    <button onclick="window.print()" class="btn btn-primary btn-sm">🖨️ Cetak / Download Tiket</button>
+  </div>
+
+  <!-- E-TICKET -->
+  <div class="ticket-card">
+    <div class="ticket-header">
+      <div class="app-name">🚢 Sistem Pemesanan Tiket Kapal</div>
+      <div class="ticket-code"><%= ticket.ticket_code %></div>
+      <span class="badge badge-success mt-1"><%= ticket.status === 'aktif' ? 'TICKET AKTIF' : ticket.status.toUpperCase() %></span>
+    </div>
+    <div class="ticket-body">
+      <div class="ticket-route">
+        <div class="port-info">
+          <div class="time"><%= ticket.departure_time %></div>
+          <div class="city"><strong><%= ticket.origin_name %></strong></div>
+          <div class="city"><%= ticket.origin_city %></div>
+          <div class="city"><%= ticket.departure_date %></div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="port-info">
+          <div class="time"><%= ticket.arrival_time %></div>
+          <div class="city"><strong><%= ticket.destination_name %></strong></div>
+          <div class="city"><%= ticket.destination_city %></div>
+          <div class="city"><%= ticket.departure_date %></div>
+        </div>
+      </div>
+
+      <div class="ticket-details">
+        <div class="detail-item">
+          <div class="label">Nama Penumpang</div>
+          <div class="value"><%= ticket.passenger_name %></div>
+        </div>
+        <div class="detail-item">
+          <div class="label">NIK</div>
+          <div class="value"><%= ticket.nik.substring(0,4) + '**********' + ticket.nik.substring(14) %></div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Nama Kapal</div>
+          <div class="value"><%= ticket.ship_name %></div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Jenis Kapal</div>
+          <div class="value"><%= ticket.ship_type %></div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Kode Booking</div>
+          <div class="value"><%= ticket.booking_code %></div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Nomor Kursi</div>
+          <div class="value"><%= ticket.seat_number || '-' %></div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Harga</div>
+          <div class="value"><%= money(ticket.price) %></div>
+        </div>
+        <div class="detail-item">
+          <div class="label">Status Pembayaran</div>
+          <div class="value text-success"><%= ticket.payment_status === 'dibayar' ? 'LUNAS' : ticket.payment_status %></div>
+        </div>
+      </div>
+
+      <div class="ticket-qr">
+        <img src="<%= qrDataUrl %>" alt="QR Code <%= ticket.ticket_code %>">
+        <div class="qr-note">Scan QR Code ini saat boarding. Tunjukkan tiket ini kepada petugas pelabuhan.</div>
+      </div>
+    </div>
+    <div class="ticket-footer">
+      E-Tiket ini sah tanpa tanda tangan. Harap tiba di pelabuhan minimal 1 jam sebelum keberangkatan.
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

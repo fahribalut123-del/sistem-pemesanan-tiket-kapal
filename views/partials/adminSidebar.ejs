@@ -1,0 +1,14 @@
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="brand"><span>🚢</span> TiketKapal</div>
+  <a href="/admin/dashboard" class="<%= currentPath === '/admin/dashboard' ? 'active' : '' %>">📊 Dashboard</a>
+  <a href="/admin/kapal" class="<%= currentPath.startsWith('/admin/kapal') ? 'active' : '' %>">🚢 Kapal</a>
+  <a href="/admin/pelabuhan" class="<%= currentPath.startsWith('/admin/pelabuhan') ? 'active' : '' %>">⚓ Pelabuhan</a>
+  <a href="/admin/rute" class="<%= currentPath.startsWith('/admin/rute') ? 'active' : '' %>">🗺️ Rute</a>
+  <a href="/admin/jadwal" class="<%= currentPath.startsWith('/admin/jadwal') ? 'active' : '' %>">📅 Jadwal</a>
+  <a href="/admin/pesanan" class="<%= currentPath.startsWith('/admin/pesanan') ? 'active' : '' %>">📋 Pemesanan</a>
+  <a href="/admin/pembayaran" class="<%= currentPath.startsWith('/admin/pembayaran') ? 'active' : '' %>">💳 Pembayaran</a>
+  <a href="/admin/penumpang" class="<%= currentPath.startsWith('/admin/penumpang') ? 'active' : '' %>">👥 Penumpang</a>
+  <a href="/admin/laporan" class="<%= currentPath.startsWith('/admin/laporan') ? 'active' : '' %>">📈 Laporan</a>
+  <a href="/" style="margin-top:auto;">🏠 Ke Website</a>
+  <a href="/logout">🚪 Logout</a>
+</aside>

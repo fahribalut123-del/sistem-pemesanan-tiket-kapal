@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <button class="nav-toggle" style="display:none;" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+      <h2 style="font-size:1.15rem; color:var(--navy);">📅 Kelola Jadwal</h2>
+      <a href="/admin/jadwal/tambah" class="btn btn-primary btn-sm">+ Tambah Jadwal</a>
+    </div>
+    <div class="admin-content">
+      <% if (success) { %><div class="alert alert-success">✅ Data berhasil disimpan.</div><% } %>
+      <% if (error) { %><div class="alert alert-warning"><%= error %></div><% } %>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th><th>Kapal</th><th>Rute</th><th>Tanggal</th><th>Jam</th>
+                  <th>Harga</th><th>Kapasitas</th><th>Tersedia</th><th>Status</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% schedules.forEach(s => { %>
+                  <tr>
+                    <td><%= s.id %></td>
+                    <td class="font-bold"><%= s.ship_name %></td>
+                    <td><%= s.origin_name %> → <%= s.destination_name %></td>
+                    <td><%= s.departure_date %></td>
+                    <td><%= s.departure_time %></td>
+                    <td><%= money(s.price) %></td>
+                    <td><%= s.capacity %></td>
+                    <td>
+                      <span class="badge <%= s.available_seats > 10 ? 'badge-success' : (s.available_seats > 0 ? 'badge-warning' : 'badge-danger') %>">
+                        <%= s.available_seats %>
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge <%= s.status === 'terjadwal' ? 'badge-info' : (s.status === 'berangkat' ? 'badge-warning' : (s.status === 'selesai' ? 'badge-success' : 'badge-danger')) %>">
+                        <%= s.status %>
+                      </span>
+                    </td>
+                    <td>
+                      <a href="/admin/jadwal/<%= s.id %>/edit" class="btn btn-outline btn-sm">Edit</a>
+                      <form method="POST" action="/admin/jadwal/<%= s.id %>/hapus" class="inline-form" onsubmit="return confirm('Yakin hapus/nonaktifkan jadwal ini?');">
+                        <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

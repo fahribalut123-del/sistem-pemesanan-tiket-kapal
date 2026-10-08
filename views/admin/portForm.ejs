@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h2 style="font-size:1.15rem; color:var(--navy);"><%= title %></h2>
+      <a href="/admin/pelabuhan" class="btn btn-secondary btn-sm">← Kembali</a>
+    </div>
+    <div class="admin-content">
+      <div class="container-narrow">
+        <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+        <div class="card">
+          <div class="card-body">
+            <form method="POST" action="/admin/pelabuhan/simpan<%= port && port.id ? '?id=' + port.id : '' %>">
+              <% if (port && port.id) { %><input type="hidden" name="id" value="<%= port.id %>"><% } %>
+              <div class="form-group mb-2">
+                <label>Nama Pelabuhan *</label>
+                <input type="text" name="name" class="form-control" value="<%= port ? port.name : '' %>" required placeholder="Contoh: Pelabuhan Manado">
+              </div>
+              <div class="form-group mb-2">
+                <label>Kota *</label>
+                <input type="text" name="city" class="form-control" value="<%= port ? port.city : '' %>" required placeholder="Contoh: Manado">
+              </div>
+              <div class="form-group mb-2">
+                <label>Provinsi *</label>
+                <input type="text" name="province" class="form-control" value="<%= port ? port.province : '' %>" required placeholder="Contoh: Sulawesi Utara">
+              </div>
+              <div class="form-group mb-2">
+                <label>Alamat</label>
+                <input type="text" name="address" class="form-control" value="<%= port ? (port.address || '') : '' %>" placeholder="Jalan, No.">
+              </div>
+              <div class="form-group mb-3">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                  <option value="aktif" <%= !port || port.status === 'aktif' ? 'selected' : '' %>>Aktif</option>
+                  <option value="nonaktif" <%= port && port.status === 'nonaktif' ? 'selected' : '' %>>Nonaktif</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">💾 Simpan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

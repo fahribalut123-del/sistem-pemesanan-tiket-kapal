@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <button class="nav-toggle" style="display:none;" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+      <h2 style="font-size:1.15rem; color:var(--navy);">⚓ Kelola Pelabuhan</h2>
+      <a href="/admin/pelabuhan/tambah" class="btn btn-primary btn-sm">+ Tambah Pelabuhan</a>
+    </div>
+    <div class="admin-content">
+      <% if (success) { %><div class="alert alert-success">✅ Data berhasil disimpan.</div><% } %>
+      <% if (error) { %><div class="alert alert-warning"><%= error %></div><% } %>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Nama</th><th>Kota</th><th>Provinsi</th><th>Alamat</th><th>Status</th><th>Aksi</th></tr>
+              </thead>
+              <tbody>
+                <% ports.forEach(p => { %>
+                  <tr>
+                    <td><%= p.id %></td>
+                    <td class="font-bold"><%= p.name %></td>
+                    <td><%= p.city %></td>
+                    <td><%= p.province %></td>
+                    <td><%= p.address || '-' %></td>
+                    <td><span class="badge <%= p.status === 'aktif' ? 'badge-success' : 'badge-danger' %>"><%= p.status %></span></td>
+                    <td>
+                      <a href="/admin/pelabuhan/<%= p.id %>/edit" class="btn btn-outline btn-sm">Edit</a>
+                      <form method="POST" action="/admin/pelabuhan/<%= p.id %>/hapus" class="inline-form" onsubmit="return confirm('Yakin hapus/nonaktifkan pelabuhan <%= p.name %>?');">
+                        <button type="submit" class="btn btn-danger btn-sm"><%= p.status === 'aktif' ? 'Nonaktifkan' : 'Hapus' %></button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

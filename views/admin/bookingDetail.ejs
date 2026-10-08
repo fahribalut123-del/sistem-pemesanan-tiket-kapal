@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <h2 style="font-size:1.15rem; color:var(--navy);">Detail Pemesanan</h2>
+      <a href="/admin/pesanan" class="btn btn-secondary btn-sm">← Kembali</a>
+    </div>
+    <div class="admin-content">
+      <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
+      <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+      <div class="card mb-3">
+        <div class="card-header">
+          <span>📋 Info Pemesanan — <%= booking.booking_code %></span>
+          <div>
+            <span class="badge <%= booking.payment_status === 'dibayar' ? 'badge-success' : (booking.payment_status === 'dibatalkan' ? 'badge-secondary' : 'badge-warning') %>">
+              <%= booking.payment_status.replace(/_/g, ' ') %>
+            </span>
+            <span class="badge <%= booking.booking_status === 'dikonfirmasi' ? 'badge-info' : (booking.booking_status === 'dibatalkan' ? 'badge-secondary' : 'badge-warning') %>">
+              <%= booking.booking_status %>
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="d-flex gap-2 flex-wrap">
+            <div style="flex:1; min-width:280px;">
+              <div class="detail-rows">
+                <div class="detail-row"><span class="label">Kode Booking</span><span class="value font-bold"><%= booking.booking_code %></span></div>
+                <div class="detail-row"><span class="label">Tanggal Pemesanan</span><span class="value"><%= booking.created_at %></span></div>
+                <div class="detail-row"><span class="label">Pelanggan</span><span class="value"><%= booking.user_name %></span></div>
+                <div class="detail-row"><span class="label">Email</span><span class="value"><%= booking.user_email %></span></div>
+                <div class="detail-row"><span class="label">Telepon</span><span class="value"><%= booking.user_phone || '-' %></span></div>
+                <div class="detail-row"><span class="label">Kapal</span><span class="value"><%= booking.ship_name %> (<%= booking.ship_type %>)</span></div>
+                <div class="detail-row"><span class="label">Rute</span><span class="value"><%= booking.origin_name %> → <%= booking.destination_name %></span></div>
+                <div class="detail-row"><span class="label">Tanggal</span><span class="value"><%= booking.departure_date %></span></div>
+                <div class="detail-row"><span class="label">Jam</span><span class="value"><%= booking.departure_time %> — <%= booking.arrival_time %> WITA</span></div>
+                <div class="detail-row"><span class="label">Jumlah Penumpang</span><span class="value"><%= booking.total_passengers %> orang</span></div>
+                <div class="detail-row"><span class="label">Harga per Tiket</span><span class="value"><%= money(booking.price) %></span></div>
+                <div class="detail-row total"><span class="label font-bold">Total Pembayaran</span><span class="value text-danger font-bold"><%= money(booking.total_price) %></span></div>
+              </div>
+            </div>
+            <div style="flex:1; min-width:280px;">
+              <h3 style="color:var(--navy); margin-bottom:.75rem;">👤 Data Penumpang</h3>
+              <div class="table-responsive">
+                <table>
+                  <thead><tr><th>#</th><th>Nama</th><th>NIK</th><th>Gender</th><th>Lahir</th></tr></thead>
+                  <tbody>
+                    <% passengers.forEach((p, i) => { %>
+                      <tr>
+                        <td><%= i+1 %></td>
+                        <td><%= p.name %></td>
+                        <td><%= p.nik.substring(0,4) + '**********' + p.nik.substring(14) %></td>
+                        <td><%= p.gender %></td>
+                        <td><%= p.birth_date %></td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if (payment) { %>
+      <div class="card mb-3">
+        <div class="card-header"><span>💳 Info Pembayaran</span></div>
+        <div class="card-body">
+          <div class="detail-rows">
+            <div class="detail-row"><span class="label">Metode</span><span class="value"><%= payment.payment_method === 'transfer_bank' ? 'Transfer Bank' : payment.payment_method === 'ewallet' ? 'E-Wallet' : 'Virtual Account' %></span></div>
+            <div class="detail-row"><span class="label">Jumlah</span><span class="value"><%= money(payment.amount) %></span></div>
+            <div class="detail-row"><span class="label">Status</span><span class="value"><span class="badge <%= payment.status === 'dibayar' ? 'badge-success' : (payment.status === 'ditolak' ? 'badge-danger' : 'badge-warning') %>"><%= payment.status.replace(/_/g, ' ') %></span></span></div>
+            <div class="detail-row"><span class="label">Referensi</span><span class="value"><%= payment.payment_reference %></span></div>
+            <% if (payment.payment_date) { %>
+              <div class="detail-row"><span class="label">Tanggal Bayar</span><span class="value"><%= payment.payment_date %></span></div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <div class="card mb-3">
+        <div class="card-header"><span>⚙️ Kelola Pemesanan</span></div>
+        <div class="card-body">
+          <div class="d-flex gap-2 flex-wrap">
+            <div style="flex:1; min-width:250px;">
+              <h4 style="color:var(--navy); margin-bottom:.5rem;">Ubah Status Pemesanan</h4>
+              <form method="POST" action="/admin/pesanan/<%= booking.booking_code %>/status" class="status-form">
+                <select name="booking_status" class="form-control" style="flex:1;">
+                  <% ['menunggu','dikonfirmasi','berangkat','selesai','dibatalkan'].forEach(st => { %>
+                    <option value="<%= st %>" <%= booking.booking_status === st ? 'selected' : '' %>><%= st.charAt(0).toUpperCase() + st.slice(1) %></option>
+                  <% }) %>
+                </select>
+                <button type="submit" class="btn btn-primary">Ubah</button>
+              </form>
+            </div>
+            <div style="flex:1; min-width:250px;">
+              <h4 style="color:var(--red); margin-bottom:.5rem;">Pembatalan</h4>
+              <% if (booking.booking_status !== 'dibatalkan' && booking.schedule_status !== 'berangkat' && booking.schedule_status !== 'selesai') { %>
+                <form method="POST" action="/admin/pesanan/<%= booking.booking_code %>/batal" onsubmit="return confirm('Yakin batalkan pemesanan ini? Kursi akan dikembalikan.');">
+                  <button type="submit" class="btn btn-danger">❌ Batalkan Pemesanan</button>
+                </form>
+              <% } else { %>
+                <p class="text-muted">Pembatalan tidak tersedia untuk pemesanan ini.</p>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <% if (tickets.length > 0) { %>
+      <div class="card">
+        <div class="card-header"><span>🎫 Tiket yang Diterbitkan</span></div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead><tr><th>Kode Tiket</th><th>Penumpang</th><th>Kursi</th><th>Status</th></tr></thead>
+              <tbody>
+                <% tickets.forEach(t => { %>
+                  <tr>
+                    <td class="font-bold" style="font-family:monospace;"><%= t.ticket_code %></td>
+                    <td><%= t.passenger_name %></td>
+                    <td><%= t.seat_number || '-' %></td>
+                    <td><span class="badge <%= t.status === 'aktif' ? 'badge-success' : 'badge-secondary' %>"><%= t.status %></span></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-3">
+  <a href="/pesanan" class="btn btn-secondary btn-sm mb-2">← Pesanan Saya</a>
+
+  <% if (booking.payment_status === 'dibayar') { %>
+    <div class="alert alert-success">✅ Pembayaran sudah selesai! <a href="/tiket" class="font-bold">Lihat Tiket Anda →</a></div>
+  <% } %>
+
+  <h2 class="section-title">Checkout — <%= booking.booking_code %></h2>
+
+  <div class="card mb-3">
+    <div class="card-header">
+      <span>🧾 Ringkasan Pemesanan</span>
+      <span class="badge <%= booking.payment_status === 'dibayar' ? 'badge-success' : (booking.payment_status === 'menunggu_verifikasi' ? 'badge-warning' : 'badge-danger') %>">
+        <%= booking.payment_status === 'dibayar' ? 'Lunas' : (booking.payment_status === 'menunggu_verifikasi' ? 'Menunggu Verifikasi' : booking.payment_status === 'ditolak' ? 'Ditolak' : 'Belum Dibayar') %>
+      </span>
+    </div>
+    <div class="card-body">
+      <div class="detail-rows">
+        <div class="detail-row"><span class="label">Kode Booking</span><span class="value font-bold"><%= booking.booking_code %></span></div>
+        <div class="detail-row"><span class="label">Kapal</span><span class="value"><%= booking.ship_name %></span></div>
+        <div class="detail-row"><span class="label">Rute</span><span class="value"><%= booking.origin_name %> → <%= booking.destination_name %></span></div>
+        <div class="detail-row"><span class="label">Tanggal</span><span class="value"><%= booking.departure_date %></span></div>
+        <div class="detail-row"><span class="label">Jam Keberangkatan</span><span class="value"><%= booking.departure_time %> — <%= booking.arrival_time %> WITA</span></div>
+        <div class="detail-row"><span class="label">Jumlah Penumpang</span><span class="value"><%= booking.total_passengers %> orang</span></div>
+        <div class="detail-row"><span class="label">Harga per Tiket</span><span class="value"><%= money(booking.price) %></span></div>
+        <div class="detail-row"><span class="label">Biaya Tambahan</span><span class="value"><%= money(fee) %></span></div>
+        <div class="detail-row total"><span class="label font-bold">Total Pembayaran</span><span class="value text-danger font-bold" style="font-size:1.2rem;"><%= money(grandTotal) %></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header"><span>👤 Data Penumpang</span></div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>#</th><th>Nama</th><th>NIK</th><th>Jenis Kelamin</th><th>Tanggal Lahir</th></tr></thead>
+          <tbody>
+            <% passengers.forEach((p, i) => { %>
+              <tr>
+                <td><%= i+1 %></td>
+                <td><%= p.name %></td>
+                <td><%= p.nik.substring(0,4) + '**********' + p.nik.substring(14) %></td>
+                <td><%= p.gender %></td>
+                <td><%= p.birth_date %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <% if (booking.payment_status !== 'dibayar' && booking.payment_status !== 'dibatalkan') { %>
+    <div class="card">
+      <div class="card-header"><span>💳 Pilih Metode Pembayaran</span></div>
+      <div class="card-body">
+        <form method="POST" action="/pembayaran/<%= booking.booking_code %>">
+          <div class="payment-methods">
+            <label class="payment-method selected" onclick="selectMethod(this)">
+              <input type="radio" name="payment_method" value="transfer_bank" checked>
+              <div class="pm-icon">🏦</div>
+              <div class="pm-name">Transfer Bank</div>
+              <div class="pm-desc">Bank BRI — VA 880012345678</div>
+            </label>
+            <label class="payment-method" onclick="selectMethod(this)">
+              <input type="radio" name="payment_method" value="ewallet">
+              <div class="pm-icon">📱</div>
+              <div class="pm-name">E-Wallet</div>
+              <div class="pm-desc">GoPay / OVO / DANA</div>
+            </label>
+            <label class="payment-method" onclick="selectMethod(this)">
+              <input type="radio" name="payment_method" value="virtual_account">
+              <div class="pm-icon">🏧</div>
+              <div class="pm-name">Virtual Account</div>
+              <div class="pm-desc">Bank Mandiri — VA 880012345678</div>
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg mt-2">Lanjutkan Pembayaran →</button>
+        </form>
+      </div>
+    </div>
+  <% } else if (booking.payment_status === 'dibayar') { %>
+    <a href="/tiket" class="btn btn-success btn-block btn-lg">🎫 Lihat Tiket Elektronik</a>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+<script>
+function selectMethod(el) {
+  document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+</body>
+</html>

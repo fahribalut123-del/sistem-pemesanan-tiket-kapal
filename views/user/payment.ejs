@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-3">
+  <a href="/checkout/<%= booking.booking_code %>" class="btn btn-secondary btn-sm mb-2">← Checkout</a>
+
+  <% if (locals.error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+  <% if (booking.payment_status === 'dibayar') { %>
+    <div class="alert alert-success text-center" style="padding:2rem;">
+      <div style="font-size:2rem;">✅</div>
+      <h2 style="color:var(--green);">Pembayaran Berhasil!</h2>
+      <p>Tiket elektronik Anda sudah tersedia.</p>
+      <a href="/tiket" class="btn btn-success mt-2">🎫 Lihat Tiket Saya</a>
+    </div>
+  <% } else if (booking.payment_status === 'menunggu_verifikasi') { %>
+    <div class="alert alert-warning text-center" style="padding:2rem;">
+      <div style="font-size:2rem;">⏳</div>
+      <h2>Menunggu Verifikasi Admin</h2>
+      <p>Pembayaran Anda sedang diverifikasi oleh admin. Mohon tunggu konfirmasi.</p>
+      <p class="mt-1"><strong>Kode Booking:</strong> <%= booking.booking_code %></p>
+    </div>
+  <% } else if (booking.payment_status === 'ditolak') { %>
+    <div class="alert alert-danger text-center">
+      <strong>Pembayaran ditolak.</strong> Silakan hubungi admin atau lakukan pemesanan baru.
+    </div>
+  <% } else { %>
+
+    <!-- Payment Instructions -->
+    <div class="card mb-3">
+      <div class="card-header"><span>💳 Instruksi Pembayaran</span></div>
+      <div class="card-body">
+        <div class="detail-rows mb-3">
+          <div class="detail-row"><span class="label">Kode Booking</span><span class="value font-bold"><%= booking.booking_code %></span></div>
+          <div class="detail-row"><span class="label">Total Pembayaran</span><span class="value text-danger font-bold" style="font-size:1.3rem;"><%= money(booking.total_price + fee) %></span></div>
+        </div>
+
+        <h3 style="color:var(--navy); margin-bottom:.75rem;">Metode Pembayaran Dipilih</h3>
+        <div class="alert alert-info">
+          <strong><%= methods[payment.payment_method].name %></strong> — <%= methods[payment.payment_method].desc %>
+        </div>
+
+        <div style="background:var(--gray-100); border-radius:var(--radius); padding:1.25rem; text-align:center; margin-bottom:1.25rem;">
+          <div class="text-muted" style="font-size:.8rem;">Nomor Virtual Account / Nomor Pembayaran</div>
+          <div style="font-family:monospace; font-size:1.6rem; font-weight:700; color:var(--navy); letter-spacing:3px;"><%= methods[payment.payment_method].va %></div>
+          <div class="text-muted" style="font-size:.85rem;"><%= methods[payment.payment_method].bank %></div>
+        </div>
+
+        <div class="alert alert-warning">
+          <strong>📝 Cara Pembayaran:</strong>
+          <ol style="margin:.5rem 0 0 1.25rem;">
+            <li>Buka aplikasi mobile banking / ATM / e-wallet Anda.</li>
+            <li>Pilih menu <strong>Transfer / Bayar</strong>.</li>
+            <li>Masukkan nomor VA di atas.</li>
+            <li>Bayar sesuai total yang tertera.</li>
+            <li>Simpan bukti pembayaran Anda.</li>
+            <li>Klik tombol <strong>"Saya Sudah Membayar"</strong> di bawah ini.</li>
+          </ol>
+        </div>
+
+        <form method="POST" action="/pembayaran/<%= booking.booking_code %>/konfirmasi">
+          <button type="submit" class="btn btn-success btn-block btn-lg">✅ Saya Sudah Membayar</button>
+        </form>
+      </div>
+    </div>
+
+  <% } %>
+
+  <!-- Booking info -->
+  <div class="card">
+    <div class="card-header"><span>📋 Info Pemesanan</span></div>
+    <div class="card-body">
+      <div class="detail-rows">
+        <div class="detail-row"><span class="label">Kapal</span><span class="value"><%= booking.ship_name %></span></div>
+        <div class="detail-row"><span class="label">Rute</span><span class="value"><%= booking.origin_name %> → <%= booking.destination_name %></span></div>
+        <div class="detail-row"><span class="label">Tanggal</span><span class="value"><%= booking.departure_date %> · <%= booking.departure_time %> WITA</span></div>
+        <div class="detail-row"><span class="label">Jumlah Penumpang</span><span class="value"><%= booking.total_passengers %> orang</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

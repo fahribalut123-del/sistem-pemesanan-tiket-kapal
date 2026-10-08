@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <%- include('../partials/adminSidebar') %>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <button class="nav-toggle" style="display:none;" onclick="document.getElementById('adminSidebar').classList.toggle('open')">☰</button>
+      <h2 style="font-size:1.15rem; color:var(--navy);">🗺️ Kelola Rute</h2>
+      <a href="/admin/rute/tambah" class="btn btn-primary btn-sm">+ Tambah Rute</a>
+    </div>
+    <div class="admin-content">
+      <% if (success) { %><div class="alert alert-success">✅ Data berhasil disimpan.</div><% } %>
+      <% if (error) { %><div class="alert alert-warning"><%= error %></div><% } %>
+
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Pelabuhan Asal</th><th>Pelabuhan Tujuan</th><th>Durasi</th><th>Status</th><th>Aksi</th></tr>
+              </thead>
+              <tbody>
+                <% routes.forEach(r => { %>
+                  <tr>
+                    <td><%= r.id %></td>
+                    <td class="font-bold"><%= r.origin_name %></td>
+                    <td class="font-bold"><%= r.destination_name %></td>
+                    <td><span class="badge badge-info"><%= r.duration %></span></td>
+                    <td><span class="badge <%= r.status === 'aktif' ? 'badge-success' : 'badge-danger' %>"><%= r.status %></span></td>
+                    <td>
+                      <a href="/admin/rute/<%= r.id %>/edit" class="btn btn-outline btn-sm">Edit</a>
+                      <form method="POST" action="/admin/rute/<%= r.id %>/hapus" class="inline-form" onsubmit="return confirm('Yakin hapus/nonaktifkan rute ini?');">
+                        <button type="submit" class="btn btn-danger btn-sm"><%= r.status === 'aktif' ? 'Nonaktifkan' : 'Hapus' %></button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

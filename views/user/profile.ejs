@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-3">
+  <div class="container-narrow">
+    <h2 class="section-title">👤 Profil Saya</h2>
+
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+    <% if (success) { %><div class="alert alert-success"><%= success %></div><% } %>
+
+    <div class="card">
+      <div class="card-header"><span>Informasi Akun</span></div>
+      <div class="card-body">
+        <form method="POST" action="/profil">
+          <div class="form-group mb-2">
+            <label>Nama Lengkap</label>
+            <input type="text" name="name" class="form-control" value="<%= profile.name %>" required>
+          </div>
+          <div class="form-group mb-2">
+            <label>Email</label>
+            <input type="email" class="form-control" value="<%= profile.email %>" disabled>
+            <small class="text-muted">Email tidak dapat diubah.</small>
+          </div>
+          <div class="form-group mb-2">
+            <label>Nomor Telepon</label>
+            <input type="tel" name="phone" class="form-control" value="<%= profile.phone || '' %>" placeholder="08xxxxxxxxxx">
+          </div>
+          <div class="form-group mb-2">
+            <label>Role</label>
+            <input type="text" class="form-control" value="<%= profile.role === 'admin' ? 'Administrator' : 'Penumpang' %>" disabled>
+          </div>
+          <div class="form-group mb-3">
+            <label>Tanggal Daftar</label>
+            <input type="text" class="form-control" value="<%= profile.created_at %>" disabled>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">💾 Simpan Perubahan</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header"><span>Statistik</span></div>
+      <div class="card-body">
+        <div class="stats-grid" style="margin-bottom:0;">
+          <div class="stat-card">
+            <div class="stat-icon blue">📋</div>
+            <div class="stat-info">
+              <div class="stat-value"><%= stats ? stats.totalBookings : 0 %></div>
+              <div class="stat-label">Total Pesanan</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">🎫</div>
+            <div class="stat-info">
+              <div class="stat-value"><%= stats ? stats.activeTickets : 0 %></div>
+              <div class="stat-label">Tiket Aktif</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

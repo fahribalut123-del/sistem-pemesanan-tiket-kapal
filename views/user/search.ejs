@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-3">
+  <div class="search-box" style="margin-top:0;">
+    <form method="GET" action="/cari">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Asal</label>
+          <select name="asal" class="form-control" required>
+            <option value="">— Pilih —</option>
+            <% ports.forEach(p => { %>
+              <option value="<%= p.id %>" <%= searchParams.asal == p.id ? 'selected' : '' %>><%= p.name %> (<%= p.city %>)</option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tujuan</label>
+          <select name="tujuan" class="form-control" required>
+            <option value="">— Pilih —</option>
+            <% ports.forEach(p => { %>
+              <option value="<%= p.id %>" <%= searchParams.tujuan == p.id ? 'selected' : '' %>><%= p.name %> (<%= p.city %>)</option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tanggal</label>
+          <input type="date" name="tanggal" class="form-control" value="<%= searchParams.tanggal || '' %>" required min="<%= new Date().toISOString().split('T')[0] %>">
+        </div>
+        <div class="form-group">
+          <label>Penumpang</label>
+          <select name="jumlah" class="form-control">
+            <% for(let i=1;i<=5;i++){ %><option value="<%= i %>" <%= searchParams.jumlah == i ? 'selected' : '' %>><%= i %></option><% } %>
+          </select>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary btn-block">🔍 Cari</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <% if (locals.errorMessage) { %>
+    <div class="alert alert-danger mt-3"><%= errorMessage %></div>
+  <% } %>
+
+  <% if (hasSearched && !locals.errorMessage) { %>
+    <h2 class="section-title mt-4">Hasil Pencarian</h2>
+    <% if (results.length === 0) { %>
+      <div class="alert alert-warning text-center mt-3" style="font-size:1.05rem; padding:2rem;">
+        <strong>⚠️ Tidak ditemukan jadwal kapal untuk pencarian tersebut.</strong><br>
+        <span class="text-muted" style="font-size:.9rem;">Coba ubah tanggal, pelabuhan, atau jumlah penumpang Anda.</span>
+      </div>
+    <% } else { %>
+      <div class="schedule-grid">
+        <% results.forEach(r => { %>
+          <div class="schedule-card">
+            <div class="card-top">
+              <div>
+                <div class="ship-name"><%= r.ship_name %></div>
+                <div class="ship-type"><%= r.ship_type %></div>
+              </div>
+              <span class="badge badge-info"><%= r.duration %></span>
+            </div>
+            <div class="route-info">
+              <div class="port">
+                <div class="time"><%= r.departure_time %></div>
+                <div class="name"><%= r.origin_name %></div>
+                <div class="name"><%= r.origin_city %></div>
+              </div>
+              <div class="route-line">
+                <div class="line"></div>
+                <div class="duration"><%= r.duration %></div>
+              </div>
+              <div class="port">
+                <div class="time"><%= r.arrival_time %></div>
+                <div class="name"><%= r.destination_name %></div>
+                <div class="name"><%= r.destination_city %></div>
+              </div>
+            </div>
+            <div style="padding:0 1.15rem .75rem; font-size:.85rem; color:var(--gray-500);">
+              📅 <%= r.departure_date %> &middot; 🚢 <%= r.ship_name %>
+            </div>
+            <div class="card-bottom">
+              <div>
+                <div class="price"><%= money(r.price) %> <small>/ tiket</small></div>
+                <span class="seat-info mt-1">
+                  <span class="dot <%= r.available_seats > 10 ? 'green' : (r.available_seats > 0 ? 'yellow' : 'red') %>"></span>
+                  <%= r.available_seats %> dari <%= r.capacity %> kursi tersedia
+                </span>
+              </div>
+              <div class="d-flex gap-1" style="flex-direction:column;">
+                <span class="badge <%= r.available_seats >= 10 ? 'badge-success' : (r.available_seats > 0 ? 'badge-warning' : 'badge-danger') %>">
+                  <%= r.available_seats >= 10 ? 'Tersedia' : (r.available_seats > 0 ? 'Terbatas' : 'Penuh') %>
+                </span>
+                <a href="/kapal/<%= r.ship_id %>" class="btn btn-outline btn-sm">Detail Kapal</a>
+                <% if (r.available_seats > 0) { %>
+                  <a href="/pesan/<%= r.id %>" class="btn btn-primary btn-sm">Pilih</a>
+                <% } else { %>
+                  <button class="btn btn-secondary btn-sm" disabled>Penuh</button>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+</body>
+</html>

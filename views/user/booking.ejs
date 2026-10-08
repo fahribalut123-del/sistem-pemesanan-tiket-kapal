@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-3">
+  <a href="/cari" class="btn btn-secondary btn-sm mb-2">← Kembali ke Pencarian</a>
+
+  <% if (!schedule) { %>
+    <div class="alert alert-danger"><%= error || 'Jadwal tidak ditemukan.' %></div>
+  <% } else { %>
+    <h2 class="section-title">Formulir Pemesanan</h2>
+
+    <% if (error) { %><div class="alert alert-danger"><%= error %></div><% } %>
+
+    <!-- Schedule Summary -->
+    <div class="card mb-3">
+      <div class="card-header"><span>📋 Ringkasan Perjalanan</span></div>
+      <div class="card-body">
+        <div class="detail-rows">
+          <div class="detail-row"><span class="label">Kapal</span><span class="value"><%= schedule.ship_name %> (<%= schedule.ship_type %>)</span></div>
+          <div class="detail-row"><span class="label">Rute</span><span class="value"><%= schedule.origin_name %> → <%= schedule.destination_name %></span></div>
+          <div class="detail-row"><span class="label">Tanggal</span><span class="value"><%= schedule.departure_date %></span></div>
+          <div class="detail-row"><span class="label">Jam Keberangkatan</span><span class="value"><%= schedule.departure_time %> — <%= schedule.arrival_time %> WITA</span></div>
+          <div class="detail-row"><span class="label">Estimasi Perjalanan</span><span class="value"><%= schedule.duration %></span></div>
+          <div class="detail-row"><span class="label">Harga per Tiket</span><span class="value"><%= money(schedule.price) %></span></div>
+          <div class="detail-row"><span class="label">Kursi Tersedia</span><span class="value"><span class="badge badge-success"><%= schedule.available_seats %> kursi</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <form method="POST" action="/pesan/<%= schedule.id %>" id="bookingForm">
+      <div class="card mb-3">
+        <div class="card-header"><span>👤 Data Penumpang</span></div>
+        <div class="card-body">
+          <div class="form-group mb-2">
+            <label>Jumlah Penumpang</label>
+            <select name="jumlah_penumpang" id="jumlahPenumpang" class="form-control" style="max-width:200px;" onchange="updatePassengerForms()">
+              <% for(let i=1; i<=maxPassengers; i++){ %>
+                <option value="<%= i %>" <%= i === 1 ? 'selected' : '' %>><%= i %> Penumpang</option>
+              <% } %>
+            </select>
+            <small class="text-muted">Maksimal <%= maxPassengers %> penumpang (kursi tersedia: <%= schedule.available_seats %>)</small>
+          </div>
+
+          <div id="passengerForms"></div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="detail-rows">
+            <div class="detail-row"><span class="label">Harga per Tiket</span><span class="value"><%= money(schedule.price) %></span></div>
+            <div class="detail-row"><span class="label">Jumlah Penumpang</span><span class="value" id="passengerCount">1</span></div>
+            <div class="detail-row total"><span class="label font-bold">Total Pembayaran</span><span class="value text-danger" id="totalPrice"><%= money(schedule.price) %></span></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">Lanjutkan ke Pembayaran →</button>
+        </div>
+      </div>
+    </form>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+const PRICE = <%= schedule ? schedule.price : 0 %>;
+const MAX = <%= maxPassengers || 1 %>;
+const GENDER_OPTIONS = ['Laki-laki', 'Perempuan'];
+
+function renderPassengerForm(index) {
+  return `
+    <div class="passenger-form-block" id="pblock${index}">
+      <h4>🧍 Penumpang ${index}</h4>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nama Lengkap</label>
+          <input type="text" name="nama_${index}" class="form-control" required placeholder="Sesuai KTP/SIM">
+        </div>
+        <div class="form-group">
+          <label>NIK (16 digit)</label>
+          <input type="text" name="nik_${index}" class="form-control" required pattern="[0-9]{16}" maxlength="16" placeholder="Contoh: 7101010101900001">
+        </div>
+        <div class="form-group">
+          <label>Jenis Kelamin</label>
+          <select name="gender_${index}" class="form-control" required>
+            <option value="">— Pilih —</option>
+            ${GENDER_OPTIONS.map(g => `<option value="${g}">${g}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tanggal Lahir</label>
+          <input type="date" name="lahir_${index}" class="form-control" required max="${new Date().toISOString().split('T')[0]}">
+        </div>
+        <div class="form-group">
+          <label>No. Telepon</label>
+          <input type="tel" name="telp_${index}" class="form-control" placeholder="08xxxxxxxxxx">
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function updatePassengerForms() {
+  const count = parseInt(document.getElementById('jumlahPenumpang').value) || 1;
+  const container = document.getElementById('passengerForms');
+  let html = '';
+  for (let i = 1; i <= count; i++) html += renderPassengerForm(i);
+  container.innerHTML = html;
+  document.getElementById('passengerCount').textContent = count;
+  document.getElementById('totalPrice').textContent = 'Rp ' + (count * PRICE).toLocaleString('id-ID');
+}
+
+// Initialize
+updatePassengerForms();
+</script>
+</body>
+</html>

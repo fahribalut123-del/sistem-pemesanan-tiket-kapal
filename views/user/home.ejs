@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — TiketKapal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<%- include('../partials/navbar') %>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <h1>🚢 Pesan Tiket Kapal Online</h1>
+    <p>Cari jadwal kapal, pesan tiket, dan dapatkan tiket elektronik secara mudah. Melayani rute-rute utama di Sulawesi Utara dan Maluku Utara.</p>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="container">
+  <div class="search-box">
+    <form method="GET" action="/cari">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Pelabuhan Asal</label>
+          <select name="asal" class="form-control" required>
+            <option value="">— Pilih Asal —</option>
+            <% ports.forEach(p => { %>
+              <option value="<%= p.id %>"><%= p.name %> (<%= p.city %>)</option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Pelabuhan Tujuan</label>
+          <select name="tujuan" class="form-control" required>
+            <option value="">— Pilih Tujuan —</option>
+            <% ports.forEach(p => { %>
+              <option value="<%= p.id %>"><%= p.name %> (<%= p.city %>)</option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tanggal Keberangkatan</label>
+          <input type="date" name="tanggal" class="form-control" required min="<%= new Date().toISOString().split('T')[0] %>">
+        </div>
+        <div class="form-group">
+          <label>Jumlah Penumpang</label>
+          <select name="jumlah" class="form-control">
+            <% for(let i=1;i<=5;i++){ %><option value="<%= i %>"><%= i %> Penumpang</option><% } %>
+          </select>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary btn-block btn-lg">🔍 Cari Tiket</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- POPULAR SCHEDULES -->
+<div class="container mt-4">
+  <h2 class="section-title">Jadwal Populer</h2>
+  <div class="schedule-grid">
+    <% popularSchedules.forEach(s => { %>
+      <div class="schedule-card">
+        <div class="card-top">
+          <div>
+            <div class="ship-name"><%= s.ship_name %></div>
+            <div class="ship-type"><%= s.origin_name %> → <%= s.destination_name %></div>
+          </div>
+          <span class="badge badge-info"><%= s.duration %></span>
+        </div>
+        <div class="route-info">
+          <div class="port">
+            <div class="time"><%= s.departure_time %></div>
+            <div class="name"><%= s.departure_date %></div>
+          </div>
+          <div class="route-line">
+            <div class="line"></div>
+            <div class="duration"><%= s.duration %></div>
+          </div>
+          <div class="port">
+            <div class="time"><%= s.arrival_time %></div>
+            <div class="name">Tiba</div>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div class="price"><%= money(s.price) %> <small>/ tiket</small></div>
+          <span class="seat-info"><span class="dot <%= s.available_seats > 10 ? 'green' : (s.available_seats > 0 ? 'yellow' : 'red') %>"></span> <%= s.available_seats %> kursi</span>
+        </div>
+        <% if (s.available_seats > 0) { %>
+          <div style="padding:0 1.15rem 1rem;">
+            <a href="/pesan/<%= s.id %>" class="btn btn-primary btn-block">Pilih Jadwal</a>
+          </div>
+        <% } %>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- POPULAR ROUTES -->
+<div class="container mt-4">
+  <h2 class="section-title">Rute Populer</h2>
+  <div class="feature-grid">
+    <% popularRoutes.forEach(r => { %>
+      <div class="feature-card">
+        <div class="icon">⛴️</div>
+        <h3><%= r.origin_name %> → <%= r.destination_name %></h3>
+        <p>Estimasi perjalanan: <strong><%= r.duration %></strong></p>
+        <p class="mt-1"><span class="badge badge-info"><%= r.schedule_count %> jadwal tersedia</span></p>
+        <a href="/cari?asal=<%= r.origin_port_id %>&tujuan=<%= r.destination_port_id %>" class="btn btn-outline btn-sm mt-2">Lihat Jadwal</a>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<div class="container mt-4 mb-4">
+  <h2 class="section-title">Layanan Kami</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="icon">🔍</div>
+      <h3>Cari Jadwal Mudah</h3>
+      <p>Cari jadwal kapal berdasarkan pelabuhan asal, tujuan, dan tanggal keberangkatan.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">💳</div>
+      <h3>Pembayaran Fleksibel</h3>
+      <p>Bayar melalui Transfer Bank, E-Wallet, atau Virtual Account.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🎫</div>
+      <h3>Tiket Elektronik</h3>
+      <p>Peroleh tiket elektronik dengan QR Code setelah pembayaran terverifikasi.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🛡️</div>
+      <h3>Aman & Terpercaya</h3>
+      <p>Data Anda terlindungi dengan sistem keamanan terenkripsi.</p>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+<script>
+document.querySelectorAll('.nav-links a').forEach(a => {
+  if (a.getAttribute('href') === '<%= currentPath %>') a.classList.add('active');
+});
+</script>
+</body>
+</html>
